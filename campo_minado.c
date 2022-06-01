@@ -1,13 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define TAM 8
+#define TAM 5
 
 //Assinatura de funções
 int dentro_do_campo (int linha, int coluna);
 int tem_bomba       (int linha, int coluna);
 int localizacao     (int linha, int coluna);
 int conta_adjacencia(int linha, int coluna);
+
+void inserir(int linha, int coluna);
+void inicializar();
+void marcar(int linha, int coluna);
+void cavar(int linha, int coluna);
+void imprime();
+void imprime_minas(); //apenas para testes
 
 int sup_esq();
 int sup_dir();
@@ -19,25 +26,39 @@ int dir(int linha);
 int inf(int coluna);
 int mid(int linha, int coluna);
 
-int campo[TAM][TAM];
+int  campo[TAM][TAM];
+char campo_aux[TAM][TAM];
 
 int main(){
+
+    inicializar();
+
+    inserir(0,0);
+    cavar(1,1);
+    
+
+    imprime();
+    imprime_minas();
+
     return 0;
 }
 
+//Usada para cavar e marcar
 int dentro_do_campo(int linha, int coluna){
    int col_lim = ((coluna < 0) || (coluna >= TAM));
    int lin_lim = ((linha  < 0) || (linha  >= TAM));
 
-   if(col_lim || lin_lim) return 1;
+   if(col_lim || lin_lim) return 0;
 
-   return 0;
+   return 1;
 }
 
+//Usada para a função cavar
 int tem_bomba(int linha, int coluna){
     return campo[linha][coluna];
 }
 
+//Usada para a função cavar
 int localizacao(int linha, int coluna){
     /* RETORNO
      - 1: Canto superior esquerdo [0]    [0]
@@ -105,6 +126,62 @@ int conta_adjacencia(int linha, int coluna){
             return mid(linha, coluna); 
             break;
         }
+    }
+}
+
+//Insere uma bomba na posição indicada
+void inserir(int linha, int coluna){
+    campo[linha][coluna] = 1;
+}
+
+void inicializar(){
+    for(int i = 0; i < TAM; i++){
+        for(int j = 0; j < TAM; j++){
+            campo[i][j] = 0;
+            campo_aux[i][j] = '-';
+        }
+    }
+
+    //inserir(0,0);
+}
+
+void marcar(int linha, int coluna){
+    if(dentro_do_campo(linha, coluna)){
+        if(campo_aux[linha][coluna] == 'B') campo_aux[linha][coluna] = '-';
+        else campo_aux[linha][coluna] = 'B';
+    } 
+}
+
+void cavar(int linha, int coluna){
+    if(dentro_do_campo(linha, coluna)){
+        if(tem_bomba(linha, coluna)){
+            printf("FIM DE JOGO! VOCÊ PERDEU!\n");
+        } else{
+            int qtd_adjacentes = conta_adjacencia(linha, coluna);
+            if(qtd_adjacentes != 0){
+                campo_aux[linha][coluna] = (char)(qtd_adjacentes)+'0';
+                //campo_aux[linha][coluna] = '1';
+            }
+        }
+    }
+}
+
+void imprime(){
+    for(int i = 0; i < TAM; i++){
+        for(int j = 0; j < TAM; j++){
+            printf("[%c]", campo_aux[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+//Usado apenas para testes
+void imprime_minas(){
+    for(int i = 0; i < TAM; i++){
+        for(int j = 0; j < TAM; j++){
+            printf("[%d]", campo[i][j]);
+        }
+        printf("\n");
     }
 }
 
