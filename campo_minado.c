@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define TAM 5
+#define TAM 3
 
 //Assinatura de funções
 int dentro_do_campo (int linha, int coluna);
@@ -15,6 +15,8 @@ void marcar(int linha, int coluna);
 void cavar(int linha, int coluna);
 void imprime();
 void imprime_minas(); //apenas para testes
+
+char conversor_int_char(int n); //Não recomendo essa prática
 
 int sup_esq();
 int sup_dir();
@@ -32,13 +34,8 @@ char campo_aux[TAM][TAM];
 int main(){
 
     inicializar();
-
-    inserir(0,0);
-    cavar(1,1);
     
-
     imprime();
-    imprime_minas();
 
     return 0;
 }
@@ -158,16 +155,26 @@ void cavar(int linha, int coluna){
             printf("FIM DE JOGO! VOCÊ PERDEU!\n");
         } else{
             int qtd_adjacentes = conta_adjacencia(linha, coluna);
-            if(qtd_adjacentes != 0){
-                campo_aux[linha][coluna] = (char)(qtd_adjacentes)+'0';
-                //campo_aux[linha][coluna] = '1';
+            printf("Quantidade de adjacentes: %d\n", qtd_adjacentes);
+            if(qtd_adjacentes != 0){ //Tem bomba ao redor, so abre o selecionado
+                campo_aux[linha][coluna] = conversor_int_char(qtd_adjacentes);
+            } else{
+                campo_aux[linha][coluna] = '0';
             }
         }
     }
 }
 
 void imprime(){
+
+    //Legenda Superior
+    printf("  ");
+    for(int i = 1; i <= TAM; i++) printf(" %d ", i);
+    printf("\n");
+
+    //Campo
     for(int i = 0; i < TAM; i++){
+        printf("%d ", i+1);
         for(int j = 0; j < TAM; j++){
             printf("[%c]", campo_aux[i][j]);
         }
@@ -185,23 +192,65 @@ void imprime_minas(){
     }
 }
 
+//Função ruim, não recomendo essa prática. Há formas melhores e corretas
+char conversor_int_char(int n){
+    switch(n){
+        case 1:
+            return '1';
+            break;
+        
+        case 2:
+            return '2';
+            break;
+
+        case 3:
+            return '3';
+            break;
+
+        case 4:
+            return '4';
+            break;
+
+        case 5:
+            return '5';
+            break;
+
+        case 6:
+            return '6';
+            break;
+
+        case 7:
+            return '7';
+            break;
+
+        default:
+            return '8';
+            break;
+    }
+}
+
 int sup_esq(){
+    printf("Sup Esq!\n");
     return (campo[0][1] + campo[1][1] + campo[1][0]);
 }
 
 int sup_dir(){
+    printf("Sup Dir!\n");
     return (campo[0][TAM-2] + campo[1][TAM-2] + campo[1][TAM-1]);
 }
 
 int inf_dir(){
+    printf("Inf Dir!\n");
     return (campo[TAM-2][TAM-1] + campo[TAM-2][TAM-2] + campo[TAM-1][TAM-2]);
 }
 
 int inf_esq(){
+    printf("Inf Esq!\n");
     return (campo[TAM-1][1] + campo[TAM-2][1] + campo[TAM-2][0]);
 }
 
 int esq(int linha){
+    printf("Esq!\n");
     int c = 0;
 
     c+= (campo[linha-1][0] + campo[linha+1][0]);
@@ -212,6 +261,7 @@ int esq(int linha){
 }
 
 int sup(int coluna){
+    printf("Sup!\n");
     int c = 0;
 
     c += (campo[0][coluna-1] + campo[0][coluna+1]);
@@ -222,6 +272,7 @@ int sup(int coluna){
 }
 
 int dir(int linha){
+    printf("Dir!\n");
     int c = 0;
 
     c+= (campo[linha-1][TAM-1] + campo[linha+1][TAM-1]);
@@ -232,6 +283,7 @@ int dir(int linha){
 }
 
 int inf(int coluna){
+    printf("Inf!\n");
     int c = 0;
 
     c += (campo[TAM-1][coluna-1] + campo[TAM-1][coluna+1]);
@@ -242,11 +294,25 @@ int inf(int coluna){
 }
 
 int mid(int linha, int coluna){
+    printf("Mid!\n");
     int c = 0;
 
+    int a1 = campo[linha-1][coluna-1];
+    int a2 = campo[linha-1][coluna];
+    int a3 = campo[linha-1][coluna+1];
+    int a4 = campo[linha][coluna-1];
+    int a5 = campo[linha][coluna+1];
+    int a6 = campo[linha+1][coluna-1];
+    int a7 = campo[linha+1][coluna];
+    int a8 = campo[linha+1][coluna+1];
+
+    return a1+a2+a3+a4+a5+a6+a7+a8;
+
+    /* Essa seria a melhor forma
     for(int j = coluna-1; j <= coluna+1; j++) c += campo[linha-1][j];
 
-    c += (campo[linha][coluna-1] + campo[linha][coluna+1]);
+    c += ((campo[linha][coluna-1]) + (campo[linha][coluna+1]));
 
     for(int j = coluna-1; j <= coluna+1; j++) c += campo[linha+1][j];
+    */
 }
